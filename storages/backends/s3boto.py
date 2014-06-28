@@ -314,10 +314,11 @@ class S3BotoStorage(Storage):
                 return entry.size
             return 0
         return self.bucket.get_key(self._encode_name(name)).size
-
+        
     def modified_time(self, name):
         try:
             from dateutil import parser, tz
+            import pytz
         except ImportError:
             raise NotImplementedError()
         name = self._normalize_name(self._clean_name(name))
@@ -332,8 +333,7 @@ class S3BotoStorage(Storage):
         if last_modified_date.tzinfo == None:
             last_modified_date = last_modified_date.replace(tzinfo=tz.tzutc())
         # convert date to local time w/o timezone
-        timezone = tz.gettz(settings.TIME_ZONE)
-        timezone.normalize(last_modified_date)
+        timezone = pytz.timezone(settings.TIME_ZONE)
         return last_modified_date.astimezone(timezone).replace(tzinfo=None)
 
     def url(self, name):
