@@ -1,10 +1,9 @@
 import os
 import mimetypes
 
-try:
-    from io import StringIO
-except ImportError:
-    from io import StringIO  # noqa
+
+from io import StringIO,BytesIO
+
 
 from django.conf import settings
 from django.core.files.base import File
@@ -314,7 +313,7 @@ class S3BotoStorage(Storage):
                 return entry.size
             return 0
         return self.bucket.get_key(self._encode_name(name)).size
-        
+
     def modified_time(self, name):
         try:
             from dateutil import parser, tz
@@ -397,7 +396,7 @@ class S3BotoStorageFile(File):
 
     def _get_file(self):
         if self._file is None:
-            self._file = StringIO()
+            self._file = BytesIO()
             if 'r' in self._mode:
                 self._is_dirty = False
                 self.key.get_contents_to_file(self._file)
